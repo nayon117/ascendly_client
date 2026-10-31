@@ -220,7 +220,7 @@ const SignUpForm = () => {
           <p className="mt-7 text-center text-sm text-muted">
             Already have an account?{" "}
             <Link
-              href="/sign-in"
+              href="/auth/signin"
               className="font-semibold text-accent transition hover:underline"
             >
               Sign in

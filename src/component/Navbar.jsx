@@ -1,9 +1,10 @@
-
 "use client";
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Bars, Xmark, ArrowUpRight } from "@gravity-ui/icons";
+import { authClient, useSession } from "@/lib/auth-client";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -13,9 +14,62 @@ const navLinks = [
 ];
 
 const Navbar = () => {
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
+
+  const user = session?.user;
+
   const [isOpen, setIsOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const closeMenu = () => setIsOpen(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+
+    try {
+      const { error } = await authClient.signOut();
+
+      if (error) {
+        console.error("Sign out failed:", error.message);
+        return;
+      }
+
+      closeMenu();
+      router.refresh();
+      router.push("/auth/signin");
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
+  const authButton = (
+    <button
+      type="button"
+      onClick={user ? handleSignOut : () => router.push("/auth/signin")}
+      disabled={isPending || isSigningOut}
+      className={`flex items-center justify-center rounded-xl px-5 py-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer ${
+        user
+          ? "border border-white/10 text-secondary hover:bg-white/5 hover:text-accent"
+          : "gap-2 bg-accent text-primary hover:bg-accent/90"
+      }`}
+    >
+      {isPending ? (
+        "Loading..."
+      ) : isSigningOut ? (
+        "Signing out..."
+      ) : user ? (
+        "Sign Out"
+      ) : (
+        <>
+          Sign in
+          <ArrowUpRight className="size-4" />
+        </>
+      )}
+    </button>
+  );
 
   return (
     <header className="sticky top-0 z-50 px-4 pt-4">
@@ -52,23 +106,8 @@ const Navbar = () => {
           ))}
         </ul>
 
-        {/* Desktop actions */}
-        <div className="hidden items-center gap-4 md:flex">
-          <Link
-            href="/sign-in"
-            className="text-sm font-semibold text-secondary transition hover:text-accent"
-          >
-            Sign in
-          </Link>
-
-          <Link
-            href="/sign-up"
-            className="flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-bold text-primary transition hover:bg-accent/90"
-          >
-            Get started
-            <ArrowUpRight className="size-4" />
-          </Link>
-        </div>
+        {/* Desktop auth */}
+        <div className="hidden md:flex">{authButton}</div>
 
         {/* Mobile menu button */}
         <button
@@ -79,11 +118,7 @@ const Navbar = () => {
           aria-controls="mobile-navigation"
           className="flex size-10 items-center justify-center rounded-xl border border-white/10 text-foreground transition hover:bg-white/10 md:hidden"
         >
-          {isOpen ? (
-            <Xmark className="size-6" />
-          ) : (
-            <Bars className="size-6" />
-          )}
+          {isOpen ? <Xmark className="size-6" /> : <Bars className="size-6" />}
         </button>
       </nav>
 
@@ -112,25 +147,10 @@ const Navbar = () => {
           ))}
         </ul>
 
-        <div className="grid grid-cols-2 gap-3 border-t border-white/10 p-4">
-          <Link
-            href="/sign-in"
-            onClick={closeMenu}
-            tabIndex={isOpen ? 0 : -1}
-            className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm font-semibold text-foreground transition hover:bg-white/5"
-          >
-            Sign in
-          </Link>
-
-          <Link
-            href="/sign-up"
-            onClick={closeMenu}
-            tabIndex={isOpen ? 0 : -1}
-            className="flex items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-primary transition hover:bg-accent/90"
-          >
-            Get started
-            <ArrowUpRight className="size-4" />
-          </Link>
+        <div className="border-t border-white/10 p-4">
+          <div className="w-full" onClick={closeMenu}>
+            {authButton}
+          </div>
         </div>
       </div>
     </header>
