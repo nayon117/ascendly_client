@@ -1,10 +1,11 @@
 import HeroBanner from "@/component/HeroBanner";
 
-const page = () => {
-    return (
-        <div>
-            <HeroBanner />
-        </div>
-    )
+const Home = () => {
+  return (
+    <>
+        <HeroBanner />
+    </>
+  );
 }
-export default page;
+
+export default Home;
