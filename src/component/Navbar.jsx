@@ -16,7 +16,6 @@ const navLinks = [
 const Navbar = () => {
   const router = useRouter();
   const { data: session, isPending } = useSession();
-
   const user = session?.user;
 
   const [isOpen, setIsOpen] = useState(false);
@@ -61,7 +60,7 @@ const Navbar = () => {
       ) : isSigningOut ? (
         "Signing out..."
       ) : user ? (
-        "Sign Out"
+        "Sign out"
       ) : (
         <>
           Sign in
@@ -107,7 +106,10 @@ const Navbar = () => {
         </ul>
 
         {/* Desktop auth */}
-        <div className="hidden md:flex">{authButton}</div>
+        <div className="hidden md:flex items-center gap-2">
+            <span  className="text-sm ml-3"> Hi! {user?.name} </span>
+            {authButton}
+            </div>
 
         {/* Mobile menu button */}
         <button
@@ -149,6 +151,7 @@ const Navbar = () => {
 
         <div className="border-t border-white/10 p-4">
           <div className="w-full" onClick={closeMenu}>
+            <span  className="text-sm ml-3"> Hi! {user?.name} </span>
             {authButton}
           </div>
         </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight } from "@gravity-ui/icons";
 import { authClient } from "@/lib/auth-client";
+import { Description, Label, Radio, RadioGroup } from "@heroui/react";
 
 const SignUpForm = () => {
   const router = useRouter();
@@ -26,12 +27,14 @@ const SignUpForm = () => {
     const name = formData.get("name");
     const email = formData.get("email");
     const password = formData.get("password");
+    const role = formData.get("role");
 
     try {
       const { data, error } = await authClient.signUp.email({
         name,
         email,
         password,
+        role,
         callbackURL: "/",
       });
 
@@ -200,6 +203,34 @@ const SignUpForm = () => {
               <p className="mt-2 text-xs text-muted">
                 Use at least 8 characters.
               </p>
+            </div>
+
+            {/* role selection */}
+            <div className="flex flex-col gap-4">
+              <Label> Role </Label>
+              <RadioGroup
+                defaultValue="seeker"
+                name="role"
+                orientation="horizontal"
+              >
+                <Radio value="seeker">
+                  <Radio.Content>
+                    <Radio.Control>
+                      <Radio.Indicator />
+                    </Radio.Control>
+                    Job Seeker
+                  </Radio.Content>
+                </Radio>
+                <Radio value="recruiter">
+                  <Radio.Content>
+                    <Radio.Control>
+                      <Radio.Indicator />
+                    </Radio.Control>
+                    Recruiter
+                  </Radio.Content>
+                </Radio>
+
+              </RadioGroup>
             </div>
 
             {/* Submit */}
